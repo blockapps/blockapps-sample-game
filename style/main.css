@@ -141,6 +141,10 @@ input[type="text"], input[type="password"] {
   font-size: 15px;
 }
 
+input[type="text"]:disabled {
+  background-color: #e6e6e6;
+}
+
 input[type="submit"], input[type="button"] {
   background: #8f7a66;
   border-radius: 3px;
@@ -994,6 +998,10 @@ hr {
     width: 150px;
     height: 10px;
     font-size: 10px;
+  }
+
+  input[type="text"]:disabled {
+    background-color: #e6e6e6;
   }
 
   .game-container .game-message {

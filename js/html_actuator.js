@@ -154,8 +154,8 @@ HTMLActuator.prototype.clearMessage = function () {
 };
 
 HTMLActuator.prototype.openModal = function () {
-  this.modalContainer.getElementsByTagName("input")[0].value = "";
-  this.modalContainer.getElementsByTagName("input")[1].value = "";
+  this.modalContainer.getElementsByTagName("input")[0].value = JSON.parse(window.localStorage.getItem("token")).username;
+  this.modalContainer.getElementsByTagName("input")[1].value = JSON.parse(window.localStorage.getItem("token")).accountAddress
   this.modalContainer.getElementsByTagName("input")[2].value = "";
   this.fadeContainer.style.display = "block";
   this.fadeContainer.style.disp2ay = "block";
