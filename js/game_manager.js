@@ -3,8 +3,6 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
   this.inputManager     = new InputManager;
   this.storageManager   = new StorageManager;
   this.actuator         = new Actuator;
-  this.contractName     = "SampleGame"; //TODO: Get contract name from initfile.json
-  this.contractAddress  = null; //TODO: Get contract address from addresses.js
 
 
   this.startTiles       = 2;
@@ -303,27 +301,52 @@ GameManager.prototype.positionsEqual = function (first, second) {
 };
 
 GameManager.prototype.submitScore = function (username, userAddress, password) {
-  let _temp = this;
+  const _score = this.score;
   return new Promise(function (resolve, reject) {
-
-    let request = new XMLHttpRequest();
-    let callContractMethodUrl = "http://cd10.eastus.cloudapp.azure.com/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+_temp.contractName+"/" + _temp.contractAddress + "/call?resolve";
-
-    let callSetBody = {
-      "args": {score: _temp.score},
-      "value": "1000000000000000000",
-      "method": "submitScore",
-      "password": password
-    };
-
-    request.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        resolve(JSON.parse(this.responseText).data.contents);
-      }
-    }
     
-    request.open("POST", callContractMethodUrl, true);
-    request.setRequestHeader("Content-type", "application/json");
-    request.send(JSON.stringify(callSetBody));
+    const contractName     = "SampleGame"; //TODO: Get contract name from initfile.json
+    const contractAddress  = null; //TODO: Get contract address from addresses.js
+
+    return getContractNamePromise()
+           .then((n) => { return getContractAddressPromise(n); })
+           .then((contract) => {
+      let request = new XMLHttpRequest();
+      let callContractMethodUrl = "http://" + window.location.hostname + "/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+ contract.contractName +"/" + contract.contractAddress + "/call?resolve";
+
+      let callSetBody = {
+        "args": {score: _score},
+        "value": "1000000000000000000",
+        "method": "submitScore",
+        "password": password
+      };
+
+      request.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+          resolve(JSON.parse(this.responseText).data.contents);
+        }
+      }
+      
+      request.open("POST", callContractMethodUrl, true);
+      request.setRequestHeader("Content-type", "application/json");
+      request.send(JSON.stringify(callSetBody));
+    });
   });
 };
+
+const getContractNamePromise = function() {
+  return new Promise((res,rej) => {
+    //TODO: Read initfile.json
+    //TODO: Get contractName
+    //TODO: Return contractName
+    return res("SampleGame");
+  });
+}
+
+const getContractAddressPromise = function(name) {
+  return new Promise((res,rej) => {
+    //TODO: Read addresses.js
+    //TODO: Get contractAddress
+    //TODO: Return contractAddress
+    return res({"contractName": name, "contractAddress": "deadbeef"});
+  });
+}
