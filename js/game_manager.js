@@ -1,10 +1,10 @@
-function GameManager(size, InputManager, Actuator, StorageManager, contractName, contractAddress) {
+function GameManager(size, InputManager, Actuator, StorageManager) {
   this.size             = size; // Size of the grid
   this.inputManager     = new InputManager;
   this.storageManager   = new StorageManager;
   this.actuator         = new Actuator;
-  this.contractName     = contractName;
-  this.contractAddress  = contractAddress;
+  this.contractName     = "SampleGame"; //TODO: Get contract name from initfile.json
+  this.contractAddress  = null; //TODO: Get contract address from addresses.js
 
 
   this.startTiles       = 2;
