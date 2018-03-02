@@ -39,14 +39,18 @@ GameManager.prototype.checkScore = function () {
 GameManager.prototype.submitLoginInfo = function (value) {
   this.actuator.openLoading();
   let _temp = this;
-  this.submitScore(value[0], value[1], value[2]).then(function(result) {
+  this.submitScore(value[0], value[1], value[2])
+  .then(function(result) {
     _temp.actuator.closeLoading();
     console.log(result);
     if(result[0] == true) {
       _temp.actuator.setMessage("Congratulations!! You earned " + (result[1]/1000000000000000000) + "STR");
     } else {
-      _temp.actuator.setMessage("Oopps!! Try Again");
+      _temp.actuator.setMessage("Oopps!! You were so close to highest score!");
     }
+  }).catch(function(err) {
+    _temp.actuator.closeLoading();
+    _temp.actuator.setMessage(err);
   });
 }
 
@@ -303,15 +307,11 @@ GameManager.prototype.positionsEqual = function (first, second) {
 GameManager.prototype.submitScore = function (username, userAddress, password) {
   const _score = this.score;
   return new Promise(function (resolve, reject) {
-    
-    const contractName     = "SampleGame"; //TODO: Get contract name from initfile.json
-    const contractAddress  = null; //TODO: Get contract address from addresses.js
-
+  
     return getContractNamePromise()
-           .then((n) => { return getContractAddressPromise(n); })
-           .then((contract) => {
-      let request = new XMLHttpRequest();
-      let callContractMethodUrl = "http://" + window.location.hostname + "/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+ contract.contractName +"/" + contract.contractAddress + "/call?resolve";
+    .then(function(contractName) {
+
+      let callContractMethodUrl = window.location.origin + "/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+ contractName +"/" + addresses.gameContract + "/call?resolve";
 
       let callSetBody = {
         "args": {score: _score},
@@ -319,34 +319,42 @@ GameManager.prototype.submitScore = function (username, userAddress, password) {
         "method": "submitScore",
         "password": password
       };
-
-      request.onreadystatechange = function() {
-        if (this.readyState === 4 && this.status === 200) {
-          resolve(JSON.parse(this.responseText).data.contents);
+  
+      $.post({
+        url: callContractMethodUrl,
+        data: JSON.stringify(callSetBody),
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+      .done(function (response) {
+        let text;
+        try {
+          text = response.data.contents
+        } catch (err) {
+          return reject(err);
         }
-      }
-      
-      request.open("POST", callContractMethodUrl, true);
-      request.setRequestHeader("Content-type", "application/json");
-      request.send(JSON.stringify(callSetBody));
+        resolve(text);
+      })
+      .fail(function(error) {
+        reject("Error: wrong user credentials provided or Bloc API is not reachable");
+      });
+
+    }).catch(function(err) {
+      reject(err);
     });
   });
 };
 
 const getContractNamePromise = function() {
-  return new Promise((res,rej) => {
-    //TODO: Read initfile.json
-    //TODO: Get contractName
-    //TODO: Return contractName
-    return res("SampleGame");
-  });
-}
-
-const getContractAddressPromise = function(name) {
-  return new Promise((res,rej) => {
-    //TODO: Read addresses.js
-    //TODO: Get contractAddress
-    //TODO: Return contractAddress
-    return res({"contractName": name, "contractAddress": "deadbeef"});
+  return new Promise((resolve, reject) => {
+    $.getJSON("initfile.json").then(function(data) {
+      resolve(data.gameContract.contractName)
+    })
+    .fail(function(err) {
+      if (err.status = 404) {
+        return reject("Error: Not Found initfile.json");
+      }
+      return reject("Error: " + err.statusText);
+    })
   });
 }

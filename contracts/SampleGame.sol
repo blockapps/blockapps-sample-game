@@ -1,6 +1,6 @@
 contract SampleGame {
 
-    string uniqueId;
+    address owner;
     uint highScore;
     address highScorer;
 
