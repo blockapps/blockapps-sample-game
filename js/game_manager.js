@@ -1,10 +1,8 @@
-function GameManager(size, InputManager, Actuator, StorageManager, contractName, contractAddress) {
+function GameManager(size, InputManager, Actuator, StorageManager) {
   this.size             = size; // Size of the grid
   this.inputManager     = new InputManager;
   this.storageManager   = new StorageManager;
   this.actuator         = new Actuator;
-  this.contractName     = contractName;
-  this.contractAddress  = contractAddress;
 
 
   this.startTiles       = 2;
@@ -41,14 +39,18 @@ GameManager.prototype.checkScore = function () {
 GameManager.prototype.submitLoginInfo = function (value) {
   this.actuator.openLoading();
   let _temp = this;
-  this.submitScore(value[0], value[1], value[2]).then(function(result) {
+  this.submitScore(value[0], value[1], value[2])
+  .then(function(result) {
     _temp.actuator.closeLoading();
     console.log(result);
     if(result[0] == true) {
       _temp.actuator.setMessage("Congratulations!! You earned " + (result[1]/1000000000000000000) + "STR");
     } else {
-      _temp.actuator.setMessage("Oopps!! Try Again");
+      _temp.actuator.setMessage("Oopps!! You were so close to highest score!");
     }
+  }).catch(function(err) {
+    _temp.actuator.closeLoading();
+    _temp.actuator.setMessage(err);
   });
 }
 
@@ -303,27 +305,56 @@ GameManager.prototype.positionsEqual = function (first, second) {
 };
 
 GameManager.prototype.submitScore = function (username, userAddress, password) {
-  let _temp = this;
+  const _score = this.score;
   return new Promise(function (resolve, reject) {
+  
+    return getContractNamePromise()
+    .then(function(contractName) {
 
-    let request = new XMLHttpRequest();
-    let callContractMethodUrl = "http://cd10.eastus.cloudapp.azure.com/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+_temp.contractName+"/" + _temp.contractAddress + "/call?resolve";
+      let callContractMethodUrl = window.location.origin + "/bloc/v2.2/users/" + username + "/" + userAddress + "/contract/"+ contractName +"/" + addresses.gameContract + "/call?resolve";
 
-    let callSetBody = {
-      "args": {score: _temp.score},
-      "value": "1000000000000000000",
-      "method": "submitScore",
-      "password": password
-    };
+      let callSetBody = {
+        "args": {score: _score},
+        "value": "1000000000000000000",
+        "method": "submitScore",
+        "password": password
+      };
+  
+      $.post({
+        url: callContractMethodUrl,
+        data: JSON.stringify(callSetBody),
+        contentType: 'application/json',
+        dataType: 'json'
+      })
+      .done(function (response) {
+        let text;
+        try {
+          text = response.data.contents
+        } catch (err) {
+          return reject(err);
+        }
+        resolve(text);
+      })
+      .fail(function(error) {
+        reject("Error: wrong user credentials provided or Bloc API is not reachable");
+      });
 
-    request.onreadystatechange = function() {
-      if (this.readyState === 4 && this.status === 200) {
-        resolve(JSON.parse(this.responseText).data.contents);
-      }
-    }
-    
-    request.open("POST", callContractMethodUrl, true);
-    request.setRequestHeader("Content-type", "application/json");
-    request.send(JSON.stringify(callSetBody));
+    }).catch(function(err) {
+      reject(err);
+    });
   });
 };
+
+const getContractNamePromise = function() {
+  return new Promise((resolve, reject) => {
+    $.getJSON("initfile.json").then(function(data) {
+      resolve(data.gameContract.contractName)
+    })
+    .fail(function(err) {
+      if (err.status = 404) {
+        return reject("Error: Not Found initfile.json");
+      }
+      return reject("Error: " + err.statusText);
+    })
+  });
+}
