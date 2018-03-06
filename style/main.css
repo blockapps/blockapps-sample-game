@@ -799,7 +799,13 @@ hr {
 }
 
 .game-explanation {
-  margin-top: 50px;
+  margin-top: 40px;
+}
+
+.warning {
+  font-size: 14px;
+  margin-top: 5px;
+  color: red
 }
 
 .user-address {
@@ -821,6 +827,12 @@ hr {
     font-size: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
+  }
+
+  .warning {
+    font-size: 10px;
+    margin-top: 0px;
+    color: red
   }
 
   .container {
