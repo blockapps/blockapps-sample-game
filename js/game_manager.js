@@ -44,7 +44,7 @@ GameManager.prototype.submitLoginInfo = function (value) {
     _temp.actuator.closeLoading();
     console.log(result);
     if(result[0] == true) {
-      _temp.actuator.setMessage("Congratulations!! You earned " + (result[1]/1000000000000000000) + "STR");
+      _temp.actuator.setMessage("Congratulations!! You earned " + (result[1]/1000000000000000000) + " STR");
     } else {
       _temp.actuator.setMessage("Oopps!! You were so close to highest score!");
     }
@@ -336,7 +336,10 @@ GameManager.prototype.submitScore = function (username, userAddress, password) {
         resolve(text);
       })
       .fail(function(error) {
-        reject("Error: wrong user credentials provided or Bloc API is not reachable");
+        if(error.responseJSON) {
+          return reject("Error: " + error.responseJSON);
+        }
+        reject("Error: Bloc API is not reachable");
       });
 
     }).catch(function(err) {
