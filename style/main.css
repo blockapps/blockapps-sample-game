@@ -803,9 +803,8 @@ hr {
 }
 
 .warning {
-  font-size: 14px;
   margin-top: 5px;
-  color: red
+  font-size: 12px;
 }
 
 .user-address {
@@ -830,9 +829,8 @@ hr {
   }
 
   .warning {
-    font-size: 10px;
-    margin-top: 0px;
-    color: red
+    margin-top: 5px;
+    font-size: 8px;
   }
 
   .container {
