@@ -1,5 +1,5 @@
 # blockapps-sample-game
-BlockApps Sample Game
+BlockApps Sample Game with storage on the Blockchain
 
 ## Using initfile.json
 In addition to naming and versioning your app in `metadata.json`, you can also use
