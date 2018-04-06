@@ -1,7 +1,7 @@
 {
     "gameContract": {
-	    "contractName": "SampleGame",
-        "contractFilename": "contracts/SampleGame.sol",
+	    "contractName": "Game",
+        "contractFilename": "contracts/Game.sol",
         "args": {}
     }
 }

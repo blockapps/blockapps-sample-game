@@ -1,10 +1,10 @@
-contract SampleGame {
+contract Game {
 
     address owner;
     uint highScore;
     address highScorer;
 
-    function SampleGame() {
+    function Game() {
         owner = msg.sender;
     }
 
@@ -15,7 +15,7 @@ contract SampleGame {
         if(score > highScore) {
             highScore = score;
             highScorer = msg.sender;
-            uint balance = this.balance;
+            uint balance = owner.balance;
             msg.sender.send(this.balance);
             return (true, balance);
         }
