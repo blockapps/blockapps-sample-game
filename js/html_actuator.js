@@ -154,11 +154,10 @@ HTMLActuator.prototype.clearMessage = function () {
 };
 
 HTMLActuator.prototype.openModal = function () {
-  this.modalContainer.getElementsByTagName("input")[0].value = window.localStorage.getItem("token")? JSON.parse(window.localStorage.getItem("token")).username : JSON.parse(window.localStorage.getItem("user")).username;
-  this.modalContainer.getElementsByTagName("input")[1].value = window.localStorage.getItem("token")? JSON.parse(window.localStorage.getItem("token")).accountAddress : JSON.parse(window.localStorage.getItem("user")).address;
+  this.modalContainer.getElementsByTagName("input")[0].value = "";
+  this.modalContainer.getElementsByTagName("input")[1].value = "";
   this.modalContainer.getElementsByTagName("input")[2].value = "";
   this.fadeContainer.style.display = "block";
-  this.fadeContainer.style.disp2ay = "block";
   this.modalContainer.style.display = "block";
 } 
 
